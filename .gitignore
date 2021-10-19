@@ -1,0 +1,8 @@
+# STM32 files
+/DebugConfig/
+/RTE/
+
+# Keil uVision files
+/Listings/
+/Objects/
+test.uvguix.storm
