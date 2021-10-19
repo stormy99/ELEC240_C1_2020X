@@ -39,7 +39,6 @@ void EXTI15_10_IRQHandler(void)
 			//LED_ON(0,0,1);
 		}
 }
-*/
 
 _Bool buttonState(char port, unsigned short pin)
 {
@@ -129,3 +128,4 @@ void dirTest(void)
 		INT_PORT->BSRR = (1 << BlueLED);
 	} else INT_PORT->BSRR = (1 << (BlueLED+16));
 }
+*/
