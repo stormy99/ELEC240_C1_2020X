@@ -3,41 +3,43 @@
 
 void init_userButton(void)
 {
-	__disable_irq();
-	
 	//ENABLE GPIO(x) Clock
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
 	RCC->APB2ENR |= 0x4000;	//Enable SYSCFG clock
 	
 	//CONFIGURE PORT PIN FUNCTIONS
 	USERBTN_PORT->MODER &=~ (3u<<(2*USER_BUTTON));
-	
+
 	SYSCFG->EXTICR[3] &= ~0x00F0;
 	SYSCFG->EXTICR[3] |= 0x0020;
-	EXTI->IMR 	|= 0x000F;
-	EXTI->RTSR 	|= 0x000F;
 	
-	__enable_irq();
+	EXTI->IMR  |= 0x2000;
+	EXTI->RTSR |= 0x2000;
+	
+	NVIC_SetPriority(EXTI15_10_IRQn, 0);
+	NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
-/*
 void EXTI15_10_IRQHandler(void)
 {
-	unsigned int currentTime = TIM2->CNT;
-		
-		if ((currentTime - startTime >= SHORT_MS) && !(currentTime - startTime >= LONG_MS)) 
-		{
-			// short press detected 
-			//switchData.BLUE = 1;
-			//LED_ON(0,1,0);
-		}
-		
-		if ((currentTime - startTime >= LONG_MS)) 
-		{
-			// long press detected
-			//switchData.BLUE_LONG_PRESS = 1;
-			//LED_ON(0,0,1);
-		}
+	extern struct _SWITCH_DATA switchData;
+	
+	TIM3_wait_ms(20);
+	if(switchData.BLUE == 1) 
+	{
+		switchData.BLUE = 0;
+	}
+	EXTI-> PR |= EXTI_PR_PR13;
+}
+
+void dirTest(void) 
+{
+	extern struct _SWITCH_DATA switchData;
+	
+	if(switchData.BLUE == 1)
+	{
+		INT_PORT->BSRR = (1 << GreenLED);
+	} else INT_PORT->BSRR = (1 << (GreenLED+16));
 }
 
 _Bool buttonState(char port, unsigned short pin)
@@ -71,11 +73,12 @@ _Bool buttonState(char port, unsigned short pin)
 	return state;																		
 }
 
+/*
 void dirTest(void)
 {
 	TIM3_wait_us(1000);
 
-	extern struct _SWITCH_DATA switchData;
+	
 		
 	unsigned int userButton = (buttonState('C', USER_BUTTON)), lastUserButton = 0;
 	enum STATES {NOT_PRESSED = 0, PRESSED};

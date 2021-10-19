@@ -26,6 +26,6 @@ static const int LONG_MS = 2000;
 void init_userButton(void);
 _Bool buttonState(char port, unsigned short pin);
 
-// void dirTest(void);
+void dirTest(void);
 
 #endif 
