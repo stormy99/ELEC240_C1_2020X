@@ -8,7 +8,7 @@ void init_userButton(void)
 	RCC->APB2ENR |= 0x4000;	//Enable SYSCFG clock
 	
 	//CONFIGURE PORT PIN FUNCTIONS
-	USERBTN_PORT->MODER &=~ (3u<<(2*USER_BUTTON));
+	USERBTN_PORT->MODER &=~ (3u<<(2*USER_BUTTON)); // Clear pin mode to input mode
 
 	SYSCFG->EXTICR[3] &= ~0x00F0;
 	SYSCFG->EXTICR[3] |= 0x0020;
@@ -24,12 +24,33 @@ void EXTI15_10_IRQHandler(void)
 {
 	extern struct _SWITCH_DATA switchData;
 	
-	TIM3_wait_ms(20);
-	if(switchData.BLUE == 1) 
+	TIM3_wait_ms(10); // Debounces the user button
+	switchData.BLUE = 1; // Sets switch activity flag
+	
+	EXTI-> PR |= EXTI_PR_PR13;
+}
+
+void checkUser(void)
+{
+	extern struct _SWITCH_DATA switchData;
+	
+	unsigned int userButton = (buttonState('C', USER_BUTTON)), startTime = 0, elapsedTime = 0;
+	
+	if(userButton != 0)
+	{
+		startTime = TIM2->CNT;
+	}
+	
+	if(userButton != 1) // Resets switch activity flag
 	{
 		switchData.BLUE = 0;
+		
+		elapsedTime = TIM2_elapsed_ms(startTime);
+		if((elapsedTime >= LONG_MS) && (switchData.BLUE == 0))
+		{
+			switchData.BLUE_LONG_PRESS = 1;
+		}
 	}
-	EXTI-> PR |= EXTI_PR_PR13;
 }
 
 void dirTest(void) 
@@ -39,7 +60,9 @@ void dirTest(void)
 	if(switchData.BLUE == 1)
 	{
 		INT_PORT->BSRR = (1 << GreenLED);
-	} else INT_PORT->BSRR = (1 << (GreenLED+16));
+	} else { 
+		INT_PORT->BSRR = (1 << (GreenLED+16));
+	}
 }
 
 _Bool buttonState(char port, unsigned short pin)

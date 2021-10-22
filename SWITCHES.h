@@ -27,5 +27,6 @@ void init_userButton(void);
 _Bool buttonState(char port, unsigned short pin);
 
 void dirTest(void);
+void checkUser(void);
 
 #endif 

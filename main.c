@@ -20,6 +20,7 @@ int main(void)
 	while(1)
 	{ 
 		dirTest();
+		checkUser();
 		__NOP();
 	}
 }
