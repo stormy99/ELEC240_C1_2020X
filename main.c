@@ -1,6 +1,6 @@
 /* STM32F427ZI Microcontroller and Module Support Board (Creation of libraries and demonstration code) */
 #include "library.h" // Container for project libraries
-#include "main.h" 	 // Metadata. structures and enum storage		
+#include "main.h" 	 // Metadata, structures and enum storage		
 
 extern struct _SWITCH_DATA switchData;
 
@@ -16,10 +16,8 @@ int main(void)
 	// Post-Initialisation Phase
 	// ...
 	
-	
 	while(1)
 	{ 
-		dirTest();
 		checkUser();
 		__NOP();
 	}

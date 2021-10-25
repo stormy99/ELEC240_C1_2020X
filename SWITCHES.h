@@ -23,7 +23,7 @@ static const int DEBOUNCE_MS = 20;
 static const int SHORT_MS = 100;
 static const int LONG_MS = 2000;
 
-void init_userButton(void);
+void init_SWITCHES(void);
 _Bool buttonState(char port, unsigned short pin);
 
 void dirTest(void);

@@ -20,6 +20,12 @@ void init_userButton(void)
 	NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
+void init_SWITCHES(void)
+{
+	// Container for AIO initialisation for library.c
+	init_userButton();
+}
+
 void EXTI15_10_IRQHandler(void)
 {
 	extern struct _SWITCH_DATA switchData;

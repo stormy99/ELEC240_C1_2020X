@@ -26,8 +26,12 @@ unsigned int TIM3_elapsed_us(unsigned int startTime);
 void TIM3_wait_us(int delay_us);
 void TIM3_wait_ms(int delay_ms);
 
+void init_TIMER(void);
+
 void Init_Timer2_Timer(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable);
+
 void Init_Timer3_Timer(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable);
+
 void Init_Timer4_RedFlash(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable);
 
 #endif 

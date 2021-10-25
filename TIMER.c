@@ -46,6 +46,21 @@ void Init_Timer4_RedFlash(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_
 	TIM4->CR1|= TIM_CR1_CEN;						// Start timer counter
 }
 
+void Init_Timer7_ADC(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable)
+{
+	RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;	// Timer 7 clock enabled
+	TIM7->DIER |= TIM_DIER_UIE;					// Timer update interrupt enabled
+	
+	TIM7->PSC = PSC_val - 1;						// Setting pre-scaler value (APB1 clock divider) 
+	TIM7->ARR = ARR_val - 1;						// Counter reload value (Auto Reload Register ARR)	
+	TIM7->CNT = 0;											// Initial value for timer counter
+	
+	if (ISR_Enable == 1)
+	{ NVIC_EnableIRQ(TIM7_IRQn); } 			// Timer 7 global interrupt enabled
+	
+	TIM7->CR1|= TIM_CR1_CEN;						// Start timer counter
+}
+
 unsigned int TIM2_elapsed_ms(unsigned int startTime)
 {
 	
@@ -79,4 +94,13 @@ void TIM3_wait_ms(int delay_ms) // Loop microsecond calculation for milliseconds
 		TIM3_wait_us(1000);
 		count --;
 	}
+}
+
+void init_TIMER(void)
+{
+	// Container for AIO initialisation for library.c
+	Init_Timer2_Timer(45000, 0xFFFFFFFF, DISABLE_ROUTINE);						// Measures ticks every half millisecond
+	Init_Timer3_Timer(PSC_Var_Delay, ARR_Var_Delay, DISABLE_ROUTINE); // Delays and measures ticks every microsecond
+	Init_Timer4_RedFlash(PSC_100ms, (2*ARR_100ms), ENABLE_ROUTINE); 	// 4.8Hz interrupt: onboard Red LED
+	//Init_Timer7_ADC(PSC_1us, 21, ENABLE_ROUTINE);											// ADC interrupt
 }

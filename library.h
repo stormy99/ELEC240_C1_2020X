@@ -6,6 +6,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+#include "ADCDAC.h"
 #include "LED.h"
 #include "SWITCHES.h"
 #include "TIMER.h"
