@@ -25,6 +25,9 @@ void initialiseAll(void)
 	switchData.BLUE_LONG_PRESS = 0;
 	switchData.BLUE_DOUBLE_PRESS = 0;
 	
+	// LCD states
+	clsLCD();
+	
 	// USART states
 	resetUSART(); // Clears and resets the terminal (PuTTY)
 }

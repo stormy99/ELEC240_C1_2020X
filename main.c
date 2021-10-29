@@ -1,5 +1,5 @@
 /* STM32F427ZI Microcontroller and Module Support Board (Creation of libraries and demonstration code) */
-#include "main.h" 	 // Metadata, structures and enum storage		
+#include "main.h" // Metadata, structures and enum storage		
 
 int main(void) 
 {
@@ -16,10 +16,13 @@ int main(void)
 	float longNumber = 1.4587945789;
 	printf("3.D.P: %.3f", longNumber);
 	
+	printLCD("Hello           ");
+	locateLCD(0, 1);
+	printLCD("      World  :) ");
 	
 	while(1)
 	{ 
-		checkUser();
+		//checkUser();
 		__NOP();
 	}
 }

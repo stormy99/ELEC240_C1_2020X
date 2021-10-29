@@ -13,7 +13,7 @@ void init_LCD(void)
 			  (3u<<(2*LCD_RS_pin))		  // Register select reset
 			| (3u<<(2*LCD_RW_pin))      // Read and write reset
 			| (3u<<(2*LCD_E_pin))       // Enable reset
-			| (0xFFFF<<(2*LCD_D0_pin))  // D4 to D7 bus reset
+			| (0xffff<<(2*LCD_D0_pin))  // D4 to D7 bus reset
 			| (3u<<(2*LCD_BL_pin))      // Reset backlighting
 			);
 	
@@ -30,6 +30,7 @@ void init_LCD(void)
 	clr_LCD_RW(); 
 	clr_LCD_E();
 	set_LCD_BL();     // Enables backlighting capabilities (if available)
+	
 	TIM3_wait_ms(40); // Power on (wait for approx. 40ms while VDD rises to ~4.5V)
 	
 	LCD_PORT->BSRR = 0x00FF0030; // Clears 8-bits, ready for write
@@ -39,7 +40,6 @@ void init_LCD(void)
 	LCD_PORT->BSRR = 0x00FF0028; // First 4-bit nibble
 	strobeLCD();
 	TIM3_wait_us(40);
-
 	
 	LCD_PORT->BSRR = 0x00FF0028; // Second 4-bit nibble
 	strobeLCD();
@@ -83,24 +83,23 @@ void putLCD(unsigned char put) // Send a character to the display
 	setDataLCD(put); // Sets data on the data-bus
 }
 
-
-void waitBusyLCD(void)
+void waitBusyLCD(void) //Wait function while LCD Busy flag is set
 {
-	unsigned int port = 1;
-	
+	int port;
 	set_LCD_bus_input();
 	set_LCD_RW();
 	clr_LCD_RS();
 	
-	while(port != 0)
+	do
 	{
 		set_LCD_E();
 		TIM3_wait_us(20);
-		port = LCD_PORT->IDR & (1u << LCD_BUSY_FLAG);
-		clr_LCD_E();
+		port = LCD_PORT->IDR & (1u << (LCD_D0_pin + 7));
 		TIM3_wait_us(20);
-	}
-
+		clr_LCD_E();
+		strobeLCD();
+	} while (port != 0);
+	TIM3_wait_us(20);
 	set_LCD_bus_output();
 	TIM3_wait_us(20);
 }
@@ -116,7 +115,17 @@ void setDataLCD(unsigned char data)
 	strobeLCD();
 }
 
-void locateLCD(unsigned int column, unsigned int row)
+void printLCD(char *strChars) // Prints a string of characters to the LCD for ease of use
+{
+	unsigned int n = 0;
+	while(* (strChars + n) > 0)
+	{
+    putLCD(* (strChars + n));
+    n++;
+	}
+}
+
+void locateLCD(unsigned int column, unsigned int row) // Select position of LCD cursor
 {
 	switch (row)
 	{
@@ -128,4 +137,12 @@ void locateLCD(unsigned int column, unsigned int row)
 			cmdLCD(0xc0 + column);
 			break;
 	}
+}
+
+void clsLCD(void) // Clears the LCD screen
+{
+	cmdLCD(0x01);
+	cmdLCD(0x80);
+	locateLCD(0, 0);
+	TIM3_wait_us(20);
 }

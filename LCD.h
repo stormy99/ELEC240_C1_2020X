@@ -2,9 +2,7 @@
 #define _LCD_H
 
 #include <stm32f4xx.h> // INCLUDE THE HEADER FILE FOR THIS MCU FAMILY
-											 // this file contains the definitions for register addresses and values etc...
-											 
-#include <stdio.h> 		 // Re-target printf to USART
+											 // this file contains the definitions for register addresses and values etc...					 
 #include "TIMER.h" 		 // Include timer delays
 
 /* GPIO ports */
@@ -50,6 +48,7 @@ void putLCD(unsigned char put);
 void waitBusyLCD(void);
 void setDataLCD(unsigned char data);
 void printLCD(char *strChars);
+void clsLCD(void);
 void locateLCD(unsigned int column, unsigned int row);
 
 #endif 
