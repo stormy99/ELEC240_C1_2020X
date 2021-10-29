@@ -7,30 +7,9 @@
 
 ## Table of Contents
 - [Features](#features)
-- [Issues](#issues)
-- [Legal](#legal)
-    - [License](#license)
-    - [Disclaimer](#disclaimer)
 
 
 ## Features
 - [Spreadsheet](https://docs.google.com/spreadsheets/d/1K_7O-bgdNsYgTAxy73LaSyokLMVCuXmlDPsqlT9L7dE/edit?usp=sharing)
-
-
-## Issues
-
-If you encounter any issues or have feedback, please report them to the [issue tracker](https://github.com/stormy99/ELEC240_EC/issues).
-
----
-
-## Legal
-
-### License
-This project uses the [MIT License](https://github.com/stormy99/ELEC240_EC/blob/master/LICENSE).
-
-### Disclaimer
-The Module Support Board (UoP MSB) is a proprietary piece of equipment for UOP Students.
-
-Although severity is unlikely, I am not responsible for what may occur if you decide to run this project for yourself.
 
 ---
