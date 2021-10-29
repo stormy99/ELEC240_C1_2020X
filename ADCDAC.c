@@ -28,14 +28,12 @@ void init_DAC(void)
 	
 	//CONFIGURE DAC
 	RCC->APB1ENR |= RCC_APB1ENR_DACEN;		// Enable DAC Clock
-	DAC->CR |= DAC_CR_EN2; 								// Enable DAC 2
+	DAC->CR |= DAC_CR_EN1; 								// Enable DAC 1
 }
 
 unsigned short readADC(unsigned int input)
 {
-	RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;		// Enable ADC Clock
-	ADC1->SQR1	&=~ ADC_SQR1_L;						// Sets Conversions/sequence to 1
-	ADC1->SQR3	&=~ ADC_SQR3_SQ1;					// Clear Channel select bits
+	ADC1->CR2 |= ADC_CR2_SWSTART;					// Begin ADC Conversion
 	
 	switch(input)
 	{
@@ -48,32 +46,14 @@ unsigned short readADC(unsigned int input)
 			break;
 	}
 	
-	ADC1->CR2		|=  ADC_CR2_ADON;					// Enable ADC Operation
-	ADC1->CR2 |= ADC_CR2_SWSTART;					// Begin ADC Operation
-	
 	// Wait until ADC Operation finialises
 	while((ADC1->SR & ADC_SR_EOC) == 0) { __NOP(); }
 	return ADC1->DR;
 }
 
-unsigned short ADCVoltage(unsigned int volt)
+void outputDAC(unsigned short data)
 {
-	extern struct _ADC_DATA dataADC;
-	
-	unsigned short data, v = 0;
-	
-	if(volt == LDR)
-	{
-		data = dataADC.ldr;
-	}
-	
-	else 
-	{
-		data = dataADC.pot;
-	}
-	
-	v = (((mVref * data) / ADCres) / 10);
-	return v;
+	DAC->DHR12R2 = (data & 0x0FFF); // Write 12-bit data to DAC2
 }
 
 void TIM7_IRQHandler(void)
@@ -83,8 +63,18 @@ void TIM7_IRQHandler(void)
 	dataADC.pot = readADC(POT); // Read input potentiometer value
 	dataADC.ldr = readADC(LDR); // Read input light-dependent-resistor value
 	
-	dataADC.sampleNumber++;
-		
+	if(dataADC.sampleNumber > 40000) // 40k Samples per second
+	{
+		dataADC.sampleNumber = 0;
+	}
+	
+	// Sine wave @ 2000Hz
+	// (40000 samples / 2000Hz) = 20 samples per wave
+	for(unsigned int sineSamples; sineSamples > 20; sineSamples++)
+	{
+		// ...
+	} 
+	
 	TIM7->SR &=~ TIM_SR_UIF;
 }
 

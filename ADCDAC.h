@@ -4,7 +4,7 @@
 #include <stm32f4xx.h> // INCLUDE THE HEADER FILE FOR THIS MCU FAMILY
 											 // this file contains the definitions for register addresses and values etc...
 
-// #include <math.h>			 // Sawtooth, triangular, sine and cosine functionality
+#include <math.h>			 // Sawtooth, triangular, sine and cosine functionality
 
 /* GPIO ports */
 #define ADC_POTIN_PORT GPIOA // Potentiometer GPIO port
@@ -14,7 +14,7 @@
 /* GPIO pins */
 #define ADC_POTIN_PIN 0 // Potentiometer GPIO pin
 #define ADC_LDRIN_PIN 0 // Light-dependent-resistor GPIO pin
-#define DAC_PIN 5 // Digital-to-analogue-converter GPIO pin
+#define DAC_PIN 4 // Digital-to-analogue-converter GPIO pin
 
 /* ADC channels */
 #define ADC_POTIN_CHANNEL 0	 // Potentiometer ADC channel
@@ -50,5 +50,14 @@ struct _ADC_DATA
 {
 	unsigned short pot, ldr, sampleNumber;
 };
+
+typedef enum Waveform 
+{
+	SQUARE,
+  SINE,
+  TRIANGLE,
+  SAW,
+  OFF
+} Waveform;
 
 #endif 

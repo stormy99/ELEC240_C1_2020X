@@ -3,10 +3,10 @@
 
 void init_LED(void)
 {
-	//ENABLE GPIO(x) Clocks
+	// ENABLE GPIO(x) Clocks
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN; // GPIOB (Onboard LEDs)
 	
-	//CONFIGURE PORT PIN FUNCTIONS
+	// CONFIGURE PORT PIN FUNCTIONS
 	/*Onboard*/
 	INT_PORT->MODER &=~ ((3u<<(2*RedLED)) | (3u<<(2*BlueLED)) | (3u<<(2*GreenLED))); //Set
 	INT_PORT->MODER  |= ((1u<<(2*RedLED)) | (1u<<(2*BlueLED)) | (1u<<(2*GreenLED))); //Reset

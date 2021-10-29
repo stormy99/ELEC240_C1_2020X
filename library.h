@@ -7,9 +7,11 @@
 #include "stdlib.h"
 
 #include "ADCDAC.h"
+#include "LCD.h"
 #include "LED.h"
 #include "SWITCHES.h"
 #include "TIMER.h"
+#include "USART.h"
 
 void initialiseAll(void);
 

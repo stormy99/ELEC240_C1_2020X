@@ -1,5 +1,6 @@
 # Keil uVision files
 *.uvoptx
+*.uvprojx
 *.storm
 
 # STM32 files
@@ -7,5 +8,3 @@
 /RTE/
 /Listings/
 /Objects/
-*.storm
-*.uvoptx

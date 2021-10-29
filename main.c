@@ -1,8 +1,5 @@
 /* STM32F427ZI Microcontroller and Module Support Board (Creation of libraries and demonstration code) */
-#include "library.h" // Container for project libraries
 #include "main.h" 	 // Metadata, structures and enum storage		
-
-extern struct _SWITCH_DATA switchData;
 
 int main(void) 
 {
@@ -15,6 +12,10 @@ int main(void)
 	
 	// Post-Initialisation Phase
 	// ...
+
+	float longNumber = 1.4587945789;
+	printf("3.D.P: %.3f", longNumber);
+	
 	
 	while(1)
 	{ 
