@@ -3,6 +3,8 @@
 
 #include <stm32f4xx.h> // INCLUDE THE HEADER FILE FOR THIS MCU FAMILY
 											 // this file contains the definitions for register addresses and values etc...					 
+#include <stdio.h>
+#include <stdlib.h>
 #include "TIMER.h" 		 // Include timer delays
 
 /* GPIO ports */

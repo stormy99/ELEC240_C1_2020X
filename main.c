@@ -11,12 +11,17 @@ int main(void)
 	initialiseAll(); 
 	
 	// Post-Initialisation Phase
-	// ...
+	loadingBarLCD();
 
+	// Printf for USART
 	float longNumber = 1.4587945789;
 	printf("3.D.P: %.3f", longNumber);
 	
-	loadingBarLCD();
+	// Printf (kinda!) for LCD
+	char buffer[16];
+	sprintf(buffer, "2.D.P: %.2f", longNumber);
+	locateLCD(0, 0);
+	printLCD(buffer);
 	
 	while(1)
 	{ 
