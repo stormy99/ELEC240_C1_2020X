@@ -54,6 +54,7 @@ void init_LCD(void)
 	cmdLCD(0x80); // Position set (1,1)
 	
 	// Load any custom characters from this point forwards during initialisation
+	loadCustomCharactersLCD();
 }
 
 void strobeLCD(void)
@@ -145,4 +146,39 @@ void clsLCD(void) // Clears the LCD screen
 	cmdLCD(0x80);
 	locateLCD(0, 0);
 	TIM3_wait_us(20);
+}
+
+void loadCustomCharactersLCD(void)
+{
+	int customCharacter[2][8] =
+	{
+		// Loading bar character (DDRAM Addr. 0x00)
+		0b00000,
+		0b00100,
+		0b01110,
+		0b11111,
+		0b11111,
+		0b01110,
+		0b00100,
+		0b00000,
+		
+		// Waving stick-man character (DDRAM Addr. 0x01)
+		0b01110,
+		0b01010,
+		0b01110,
+		0b10101,
+		0b01110,
+		0b00100,
+		0b00100,
+		0b01010
+	};
+	
+	for(int x = 0; x < 2; x++)
+	{
+		for(int i = 0; i < 8; i++)
+		{
+			cmdLCD((0x40 | (x<<3) |i));    // Set CGRRAM Addr. to store
+			putLCD(customCharacter[x][i]); // Write to CGRAM Addr.
+		}
+	}
 }

@@ -50,5 +50,6 @@ void setDataLCD(unsigned char data);
 void printLCD(char *strChars);
 void clsLCD(void);
 void locateLCD(unsigned int column, unsigned int row);
+void loadCustomCharactersLCD(void);
 
 #endif 

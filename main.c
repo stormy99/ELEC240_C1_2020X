@@ -16,9 +16,7 @@ int main(void)
 	float longNumber = 1.4587945789;
 	printf("3.D.P: %.3f", longNumber);
 	
-	printLCD("Hello           ");
-	locateLCD(0, 1);
-	printLCD("      World  :) ");
+	loadingBarLCD();
 	
 	while(1)
 	{ 
