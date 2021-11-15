@@ -1,5 +1,12 @@
 #include "ADCDAC.h"
 
+unsigned short ADC_DATA;
+unsigned int Channel = 0;
+int const samplesSize = 40; // 40k/sec
+int maxSample;
+int Samples[samplesSize];
+int nextSample;
+
 void init_ADC(void)
 {
 	//ENABLE GPIO(x) Clocks
@@ -9,6 +16,7 @@ void init_ADC(void)
 	//CONFIGURE PORT PIN FUNCTIONS
 	ADC_POTIN_PORT->MODER |= (3u<<(2*ADC_POTIN_PIN)); // ADC Potentiometer input set to analogue operation
 	ADC_LDRIN_PORT->MODER |= (3u<<(2*ADC_LDRIN_PIN)); // ADC Light-dependent-resistor input set to analogue operation
+	ADC_LDRIN_PORT->MODER |= (3u<<(2*ADC_MICIN_PIN)); // ADC Microphone input set to analogue operation
 	
 	//CONFIGURE ADC
 	RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;		// Enable ADC Clock
@@ -28,54 +36,118 @@ void init_DAC(void)
 	
 	//CONFIGURE DAC
 	RCC->APB1ENR |= RCC_APB1ENR_DACEN;		// Enable DAC Clock
-	DAC->CR |= DAC_CR_EN1; 								// Enable DAC 1
+	DAC->CR |= DAC_CR_EN2; 								// Enable DAC 2
 }
 
-unsigned short readADC(unsigned int input)
+unsigned short readADC_Channel(void)
 {
-	ADC1->CR2 |= ADC_CR2_SWSTART;					// Begin ADC Conversion
+	ADC1->SQR3 &=~ ADC_SQR3_SQ1; // Channel select bits
 	
-	switch(input)
+	switch(Channel)
 	{
-		case 0:
+		case 0: // LDR ADC Input
 			ADC1->SQR3 |= ADC_LDRIN_CHANNEL;
 			break;
 		
-		case 1:
+		case 1: // Potentiometer ADC Input
+			ADC1->SQR3 |= ADC_POTIN_CHANNEL;
+			break;
+		
+		case 2: // Microphone ADC Input
+			ADC1->SQR3 |= ADC_MICIN_CHANNEL;
+			break;
+		
+		case 3: // Temp (AudioIN) ADC Input
 			ADC1->SQR3 |= ADC_POTIN_CHANNEL;
 			break;
 	}
 	
 	// Wait until ADC Operation finialises
+	ADC1->CR2 |= ADC_CR2_SWSTART; // Begin ADC Conversion
 	while((ADC1->SR & ADC_SR_EOC) == 0) { __NOP(); }
 	return ADC1->DR;
 }
 
-void outputDAC(unsigned short data)
+double readADC_Voltage(void)
 {
-	DAC->DHR12R2 = (data & 0x0FFF); // Write 12-bit data to DAC2
+	double v = 0;
+	v = ((3 * (float)ADC_DATA)/4095);	
+	return v;
+}
+
+void generateWaveform(int wave)
+{
+	int currentSample = 0;
+	signed int change = +341;
+	
+	switch(wave)
+	{
+		case 0: // Sets all sampling at zero
+			maxSample = samplesSize;
+		
+			for(int i = 0; i < maxSample; i++)
+			{
+				Samples[i] = 0;
+			}
+			break;
+		
+		case 1: // Sine wave generation
+			maxSample = (samplesSize/2);
+		
+		  for(int i = 0; i < maxSample; i++) // Approx: 2kHz Sine
+			{
+				Samples[i] = (2048 + (2047 * sin((RadPerDeg * 360) / maxSample * i))); 
+			}
+			break;
+		
+		case 2: // Triangular wave generation
+			maxSample = (samplesSize / 3);
+			
+			for (int i = 0; i < maxSample; i++) // Approx: 4kHz Triangle
+			{
+				if (currentSample >= 2040)
+				{
+						currentSample = 2046;
+						change = -170;				
+				}
+
+				else if (currentSample <= 0 )
+				{
+					currentSample = 0;
+					change = +170;
+				}
+				Samples[i] = currentSample;
+				currentSample = currentSample + change;
+			}
+			break;
+		
+		case 3: // Square wave generation
+			maxSample = (samplesSize / 6);
+		
+			for(int i = 0; i < maxSample; i++) // Approx: 8kHz Square
+			{	
+				if (i == maxSample / 2)
+				{
+					currentSample = 2047;
+				}
+				Samples[i] = currentSample;
+			}
+	}
+}
+
+void TIM6_DAC_IRQHandler(void)
+{
+	TIM6->SR &= ~TIM_SR_UIF; // Clear interrupt flag in status register
+	
+	DAC->DHR12R2 = (Samples[nextSample] & 0x0FFF);
+	nextSample++;
+	if (nextSample>=maxSample){ nextSample = 0; } // Resets samples after max threshold surpassed
 }
 
 void TIM7_IRQHandler(void)
 {
-	extern struct _ADC_DATA dataADC;
-	
-	dataADC.pot = readADC(POT); // Read input potentiometer value
-	dataADC.ldr = readADC(LDR); // Read input light-dependent-resistor value
-	
-	if(dataADC.sampleNumber > 40000) // 40k Samples per second
-	{
-		dataADC.sampleNumber = 0;
-	}
-	
-	// Sine wave @ 2000Hz
-	// (40000 samples / 2000Hz) = 20 samples per wave
-	for(unsigned int sineSamples; sineSamples > 20; sineSamples++)
-	{
-		// ...
-	} 
-	
-	TIM7->SR &=~ TIM_SR_UIF;
+	ADC_DATA = readADC_Channel();
+	TIM7->SR &= ~TIM_SR_UIF; // Clear interrupt flag in status register
 }
 
 void init_ADCDAC(void)

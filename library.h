@@ -7,6 +7,7 @@
 #include "stdlib.h"
 
 #include "ADCDAC.h"
+#include "BUZZER.h"
 #include "LCD.h"
 #include "LED.h"
 #include "SWITCHES.h"

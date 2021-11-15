@@ -21,17 +21,38 @@
 #define ARR_1us 		    2
 #define ARR_Var_Delay	  0xFFFF	//allows overflow
 
+#define watchdogReset() (IWDG->KR = 0xAAAA)
+
+typedef enum 
+{
+	watchdogTimeout5MS   = 0x00,
+	watchdogTimeout10MS  = 0x01,
+	watchdogTimeout15MS  = 0x02,
+	watchdogTimeout30MS  = 0x03,
+	watchdogTimeout60MS  = 0x04,
+	watchdogTimeout120MS = 0x05,
+	watchdogTimeout250MS = 0x06,
+	watchdogTimeout500MS = 0x07,
+	watchdogTimeout1S    = 0x08,
+	watchdogTimeout2S    = 0x09,
+	watchdogTimeout4S    = 0x0A,
+	watchdogTimeout8S    = 0x0B,
+	watchdogTimeout16S   = 0x0C,
+	watchdogTimeout32S   = 0x0D,
+} watchdogTimeout;
+
+int init_watchDog(watchdogTimeout wdTimeout);
+
 unsigned int TIM2_elapsed_ms(unsigned int startTime);
 unsigned int TIM3_elapsed_us(unsigned int startTime);
 void TIM3_wait_us(int delay_us);
 void TIM3_wait_ms(int delay_ms);
-
 void init_TIMER(void);
-
+void Init_Timer1_BuzzerPWM(unsigned int time_period_us);
 void Init_Timer2_Timer(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable);
-
 void Init_Timer3_Timer(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable);
-
 void Init_Timer4_RedFlash(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable);
+void Init_Timer6_DAC(void);
+void Init_Timer7_ADC(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable);
 
 #endif 

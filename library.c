@@ -1,7 +1,6 @@
 /* Initialisation of peripheral libraries */
 #include "library.h"
 
-struct _ADC_DATA dataADC;
 struct _SWITCH_DATA switchData;
 
 void initialiseAll(void)
@@ -11,6 +10,7 @@ void initialiseAll(void)
 	/* Initialise Libraries */
 	init_TIMER();
 	init_ADCDAC();
+	init_BUZZER();
 	init_LCD();
 	init_LED();
 	init_SWITCHES();
