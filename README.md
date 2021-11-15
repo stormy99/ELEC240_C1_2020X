@@ -5,10 +5,6 @@
 
  ---
 
-## Table of Contents
-- [Features](#features)
-
-
 ## Features
 - [Spreadsheet](https://docs.google.com/spreadsheets/d/1K_7O-bgdNsYgTAxy73LaSyokLMVCuXmlDPsqlT9L7dE/edit?usp=sharing)
 
