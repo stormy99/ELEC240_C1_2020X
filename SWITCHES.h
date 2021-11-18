@@ -10,6 +10,13 @@
 #define USERBTN_PORT GPIOC
 #define USER_BUTTON 13 //PC13
 
+/* Direction-buttons */
+#define DIRBTN_PORT GPIOG
+#define DIRBTN_A 0
+#define DIRBTN_B 1
+#define DIRBTN_C 2
+#define DIRBTN_D 3
+
 // Button event permutations
 struct _SWITCH_DATA // Structure to store metadata
 {
@@ -17,6 +24,11 @@ struct _SWITCH_DATA // Structure to store metadata
 	_Bool BLUE_SHORT_PRESS;
 	_Bool BLUE_LONG_PRESS;
 	_Bool BLUE_DOUBLE_PRESS;
+	
+	_Bool A;
+	_Bool B;
+	_Bool C;
+	_Bool D;
 };
 
 static const int DEBOUNCE_MS = 20;

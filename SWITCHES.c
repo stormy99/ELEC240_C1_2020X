@@ -1,13 +1,30 @@
 /* Configuring the GPIOs and appropriate pins to enable use of the blue user button and D-PAD switches */
 #include "SWITCHES.h"
 
+/*
+int buttonAOnCounter;
+int buttonAOffCounter;
+
+int buttonBOnCounter;
+int buttonBOffCounter;
+
+int buttonCOnCounter;
+int buttonCOffCounter;
+
+int buttonDOnCounter;
+int buttonDOffCounter;
+
+int buttonBlueOnCounter;
+int buttonBlueOffCounter;
+*/
+
 void init_userButton(void)
 {
-	//ENABLE GPIO(x) Clock
+	// ENABLE GPIO(x) Clock
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
 	RCC->APB2ENR |= 0x4000;	//Enable SYSCFG clock
 	
-	//CONFIGURE PORT PIN FUNCTIONS
+	// CONFIGURE PORT PIN FUNCTIONS
 	USERBTN_PORT->MODER &=~ (3u<<(2*USER_BUTTON)); // Clear pin mode to input mode
 
 	SYSCFG->EXTICR[3] &= ~0x00F0;
@@ -16,26 +33,87 @@ void init_userButton(void)
 	EXTI->IMR  |= 0x2000;
 	EXTI->RTSR |= 0x2000;
 	
-	NVIC_SetPriority(EXTI15_10_IRQn, 0);
 	NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
-void init_SWITCHES(void)
+void init_directionalButtons(void)
 {
-	// Container for AIO initialisation for library.c
-	init_userButton();
+	// ENABLE GPIO(x) Clock
+	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOGEN;
+	
+	// CONFIGURE PORT PIN FUNCTIONS
+	DIRBTN_PORT->MODER &= 
+		~((3u<<(2*DIRBTN_A))
+		| (3u<<(2*DIRBTN_B))
+		| (3u<<(2*DIRBTN_C))
+		| (3u<<(2*DIRBTN_D)));
+	
+	DIRBTN_PORT->MODER |= 
+			(0u<<(2*DIRBTN_A))
+		| (0u<<(2*DIRBTN_B))
+		| (0u<<(2*DIRBTN_C))
+		| (0u<<(2*DIRBTN_D));
+	
+	DIRBTN_PORT->PUPDR &=
+			(0<<2*DIRBTN_A)
+		| (0<<2*DIRBTN_B)
+		| (0<<2*DIRBTN_C)
+		| (0<<2*DIRBTN_D);
+	
+	DIRBTN_PORT->PUPDR |=
+			(2<<2*DIRBTN_A)
+		| (2<<2*DIRBTN_B)
+		| (2<<2*DIRBTN_C)
+		| (2<<2*DIRBTN_D);
+		
+	//SYSCFG->EXTICR[0] &=~ (0xFFFF);	// Clear selection
+	//SYSCFG->EXTICR[0] |= (0x6666);	// Select port C
+	
+	//EXTI->IMR 	|= 0x000F;
+	//EXTI->RTSR 	|= 0x000F;
+	
+	//NVIC_EnableIRQ(EXTI0_IRQn);
+	//NVIC_EnableIRQ(EXTI1_IRQn);
+	//NVIC_EnableIRQ(EXTI2_IRQn);
+	//NVIC_EnableIRQ(EXTI3_IRQn);
 }
 
 void EXTI15_10_IRQHandler(void)
 {
 	extern struct _SWITCH_DATA switchData;
 	
-	TIM3_wait_ms(10); // Debounces the user button
+	TIM3_wait_ms(12); // Debounces the user button
 	switchData.BLUE = 1; // Sets switch activity flag
 	
 	EXTI-> PR |= EXTI_PR_PR13;
 }
 
+void EXTI0_IRQHandler(void){
+	
+	EXTI->PR = 0x0001;	//clears pending bit
+	
+}
+void EXTI1_IRQHandler(void){
+	
+	EXTI->PR = 0x0002;
+}
+void EXTI2_IRQHandler(void){
+	
+	EXTI->PR = 0x0004;
+}
+void EXTI3_IRQHandler(void){
+	
+	EXTI->PR = 0x0008;
+}
+
+void init_SWITCHES(void)
+{
+	// Container for AIO initialisation for library.c
+	init_directionalButtons();
+	init_userButton();
+}
+
+/*
 void checkUser(void)
 {
 	extern struct _SWITCH_DATA switchData;
@@ -70,6 +148,7 @@ void dirTest(void)
 		INT_PORT->BSRR = (1 << (GreenLED+16));
 	}
 }
+*/
 
 _Bool buttonState(char port, unsigned short pin)
 {
@@ -101,63 +180,3 @@ _Bool buttonState(char port, unsigned short pin)
 	}
 	return state;																		
 }
-
-/*
-void dirTest(void)
-{
-	TIM3_wait_us(1000);
-
-	
-		
-	unsigned int userButton = (buttonState('C', USER_BUTTON)), lastUserButton = 0;
-	enum STATES {NOT_PRESSED = 0, PRESSED};
-	unsigned int startTime = 0, timeElapsed = 0, longPressCount = 0, currentState = NOT_PRESSED, nextState = NOT_PRESSED;
-	
-	timeElapsed = (TIM2->CNT - startTime)&0xFFFF;
-	switch(currentState)
-	{
-		case NOT_PRESSED:
-			if(userButton > 1)
-			{
-				lastUserButton = userButton;
-				startTime = TIM2->CNT;
-				nextState = PRESSED;
-			} else nextState = NOT_PRESSED;
-			break;
-			
-		case PRESSED:
-			if((userButton == 0) && (timeElapsed < DEBOUNCE_MS)) { nextState = NOT_PRESSED; }
-			
-			if(userButton == 0)
-			{
-				startTime = 0;
-				timeElapsed = 0;
-				longPressCount = 0;
-				switchData.BLUE = 1;
-			} else switchData.BLUE = 0;
-			
-			if((userButton == 1) && (timeElapsed > 0x3E8))
-			{
-				longPressCount++;
-				
-				if(longPressCount > LONG_MS) 
-				{ 
-					switchData.BLUE_LONG_PRESS = 1; 
-				} else switchData.BLUE_LONG_PRESS = 0;
-				startTime = TIM2->CNT;
-			}
-			break;
-	}
-	currentState = nextState;
-	
-	if(switchData.BLUE == 1)
-	{
-		INT_PORT->BSRR = (1 << GreenLED);
-	} else INT_PORT->BSRR = (1 << (GreenLED+16));
-	
-	if(switchData.BLUE_LONG_PRESS == 1)
-	{
-		INT_PORT->BSRR = (1 << BlueLED);
-	} else INT_PORT->BSRR = (1 << (BlueLED+16));
-}
-*/

@@ -91,15 +91,19 @@ void generateWaveform(int wave)
 			}
 			break;
 		
-		case 1: // Sine wave generation
-			maxSample = (samplesSize/2);
+		case 1: // Square wave generation
+			maxSample = (samplesSize / 6);
 		
-		  for(int i = 0; i < maxSample; i++) // Approx: 2kHz Sine
-			{
-				Samples[i] = (2048 + (2047 * sin((RadPerDeg * 360) / maxSample * i))); 
+			for(int i = 0; i < maxSample; i++) // Approx: 8kHz Square
+			{	
+				if (i == maxSample / 2)
+				{
+					currentSample = 2047;
+				}
+				Samples[i] = currentSample;
 			}
 			break;
-		
+			
 		case 2: // Triangular wave generation
 			maxSample = (samplesSize / 3);
 			
@@ -120,18 +124,15 @@ void generateWaveform(int wave)
 				currentSample = currentSample + change;
 			}
 			break;
+			
+		case 3: // Sine wave generation
+			maxSample = (samplesSize/2);
 		
-		case 3: // Square wave generation
-			maxSample = (samplesSize / 6);
-		
-			for(int i = 0; i < maxSample; i++) // Approx: 8kHz Square
-			{	
-				if (i == maxSample / 2)
-				{
-					currentSample = 2047;
-				}
-				Samples[i] = currentSample;
+		  for(int i = 0; i < maxSample; i++) // Approx: 2kHz Sine
+			{
+				Samples[i] = (2048 + (2047 * sin((RadPerDeg * 360) / maxSample * i))); 
 			}
+			break;
 	}
 }
 

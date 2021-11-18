@@ -11,27 +11,18 @@ int main(void)
 	initialiseAll();
 	DBGMCU->APB1FZ |= DBGMCU_APB1_FZ_DBG_IWDG_STOP; // Disables watchdog timer whilst in debug mode	
 	
-	// Post-Initialisation Phase*
+	// Post-Initialisation Phase
 	loadingBarLCD();
-	
-	TIM3_wait_ms(1000);
-	
-	if(init_watchDog(watchdogTimeout1S)) {} // Initialise watchdog timer and set timeout to 1 second
-	else {}
-	
-	float longNumber = 1.4587945789; // Printf for USART
-	printf("3.D.P: %.3f", longNumber);
+	Init_Timer5_SecTimer(5*PSC_100ms, (2*ARR_100ms), ENABLE_ROUTINE);
+	init_watchDog(watchdogTimeout2S); // Watchdog timer: set timeout
 		
-	char buffer[16]; // Printf (kinda!) for LCD
-	sprintf(buffer, "2.D.P: %.2f", longNumber);
-	locateLCD(0, 0);
-	printLCD(buffer);
+	// Main
+
 
 	while(1)
 	{ 
 		//checkUser();
 		generateWaveform(0);
 		watchdogReset();
-		__NOP();
 	}
 }

@@ -5,6 +5,57 @@
 											 // this file contains the definitions for register addresses and values etc...
 #include "library.h"   // Container for project libraries
 
+void TIM4_IRQHandler(void)
+{
+	TIM4->SR &= ~TIM_SR_UIF;		// Clear interrupt flag in status register
+	GPIOB->ODR ^= (1u<<RedLED);	// Toggle red led every ~208ms (4.8Hz)
+}
+
+int segCounter = -1;
+int trafficCounter = -1;
+double voltage = 0;
+void TIM5_IRQHandler(void)
+{
+	TIM5->SR &= ~TIM_SR_UIF;		// Clear interrupt flag in status register
+	
+	// Update 7-seg Counter
+	if(segCounter > 58)
+	{
+		segCounter = 0;
+	} else {
+		segCounter = segCounter + 1;
+	}
+	LED_7SEG_PRINT(segCounter);
+	
+	// Update Traffic Lights
+	if(trafficCounter > 6)
+	{
+		trafficCounter = 0;
+	} else {
+		trafficCounter = trafficCounter + 1;
+	}
+	trafficLights(trafficCounter);
+	
+	// Update Voltage
+	voltage = readADC_Voltage();
+	
+	// Update USART/LCD with new voltage
+	printf("3.D.P: %.3fV\r", voltage);
+	
+	char buffer[16];
+	sprintf(buffer, "3.D.P: %.3fV", voltage);
+	locateLCD(0, 0);
+	printLCD(buffer);
+	
+	char buffer1[16];
+	sprintf(buffer1, "%.3f", voltage);
+	
+	// Update blue onboard LED with voltage in morse form
+	doMorse(buffer1);
+	
+	LED_RGB_VOLTAGE(voltage);
+}
+
 void loadingBarLCD(void)
 {
 	locateLCD(0, 0);

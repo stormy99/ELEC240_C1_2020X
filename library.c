@@ -16,6 +16,11 @@ void initialiseAll(void)
 	init_SWITCHES();
 	init_USART(230400);
 	
+	/* Set initial states */
+	// LEDs
+	LED_7SEG_PRINT(00);
+	
+	
 	__enable_irq();	
 	
 	/* Set initial states */
@@ -24,9 +29,15 @@ void initialiseAll(void)
 	switchData.BLUE_SHORT_PRESS = 0;
 	switchData.BLUE_LONG_PRESS = 0;
 	switchData.BLUE_DOUBLE_PRESS = 0;
+	switchData.A = 0;
+	switchData.B = 0;
+	switchData.C = 0;
+	switchData.D = 0;
 	
 	// LCD states
-	clsLCD();
+	
+	
+	// LED states
 	
 	// USART states
 	resetUSART(); // Clears and resets the terminal (PuTTY)
