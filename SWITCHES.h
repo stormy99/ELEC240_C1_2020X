@@ -21,7 +21,6 @@
 struct _SWITCH_DATA // Structure to store metadata
 {
 	_Bool BLUE;
-	_Bool BLUE_SHORT_PRESS;
 	_Bool BLUE_LONG_PRESS;
 	_Bool BLUE_DOUBLE_PRESS;
 	
@@ -35,6 +34,7 @@ static const int DEBOUNCE_MS = 20;
 static const int SHORT_MS = 100;
 static const int LONG_MS = 2000;
 
+void pollSwitch(void);
 void init_SWITCHES(void);
 _Bool buttonState(char port, unsigned short pin);
 

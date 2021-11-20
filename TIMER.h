@@ -55,6 +55,7 @@ void Init_Timer4_RedFlash(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_
 void Init_Timer5_SecTimer(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable);
 void Init_Timer6_DAC(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable);
 void Init_Timer7_ADC(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable);
-void Init_Timer9_Updater(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable);
+void Init_Timer9_MorseTimer(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable);
+void Init_Timer11_UpdateTimer(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable);
 
 #endif 

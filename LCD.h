@@ -53,5 +53,6 @@ void printLCD(char *strChars);
 void clsLCD(void);
 void locateLCD(unsigned int column, unsigned int row);
 void loadCustomCharactersLCD(void);
+void displayVoltageLCD(double voltage, int ADCDAC, int optionDAC, int optionADC);
 
 #endif 

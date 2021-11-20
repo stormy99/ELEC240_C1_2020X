@@ -108,6 +108,37 @@ void Init_Timer7_ADC(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enabl
 	TIM7->CR1|= TIM_CR1_CEN;						// Start timer counter
 }
 
+void Init_Timer9_MorseTimer(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable)
+{
+	RCC->APB2ENR |= RCC_APB2ENR_TIM9EN;	// Timer 9 clock enabled
+	TIM9->DIER |= TIM_DIER_UIE;					// Timer update interrupt enabled
+	
+	TIM9->PSC = PSC_val - 1;						// Setting pre-scaler value (APB1 clock divider) 
+	TIM9->ARR = ARR_val - 1;						// Counter reload value (Auto Reload Register ARR)	
+	TIM9->CNT = 0;											// Initial value for timer counter
+
+	if (ISR_Enable == 1)
+	{ NVIC_EnableIRQ(TIM1_BRK_TIM9_IRQn); } 			// Timer 9 global interrupt enabled } 
+		
+	TIM9->CR1|= TIM_CR1_CEN;						// Start timer counter
+}
+
+
+void Init_Timer11_UpdateTimer(unsigned int PSC_val, unsigned int ARR_val, _Bool ISR_Enable)
+{
+	RCC->APB1ENR |= RCC_APB2ENR_TIM11EN;// Timer 11 clock enabled
+	TIM11->DIER |= TIM_DIER_UIE;					// Timer update interrupt enabled
+	
+	TIM11->PSC = PSC_val - 1;						// Setting pre-scaler value (APB1 clock divider) 
+	TIM11->ARR = ARR_val - 1;						// Counter reload value (Auto Reload Register ARR)	
+	TIM11->CNT = 0;											// Initial value for timer counter
+	
+	if (ISR_Enable == 1)
+	{ NVIC_EnableIRQ(TIM1_TRG_COM_TIM11_IRQn); } 			// Timer 11 global interrupt enabled
+	
+	TIM11->CR1|= TIM_CR1_CEN;						// Start timer counter
+}
+
 unsigned int TIM2_elapsed_ms(unsigned int startTime)
 {
 	
@@ -239,4 +270,5 @@ void init_TIMER(void)
 	//Init_Timer5_SecTimer(5*PSC_100ms, (2*ARR_100ms), ENABLE_ROUTINE); // Interrupt used for ticking multiple operations each second
 	Init_Timer6_DAC(5, 376, ENABLE_ROUTINE);													// DAC interrupt
 	Init_Timer7_ADC(PSC_1us, 21, ENABLE_ROUTINE);											// ADC interrupt
+	Init_Timer9_MorseTimer(3*PSC_1ms, (5*ARR_1ms), ENABLE_ROUTINE);
 }

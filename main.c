@@ -14,15 +14,17 @@ int main(void)
 	// Post-Initialisation Phase
 	loadingBarLCD();
 	Init_Timer5_SecTimer(5*PSC_100ms, (2*ARR_100ms), ENABLE_ROUTINE);
+	Init_Timer11_UpdateTimer(5*PSC_100ms, (2*ARR_100ms), ENABLE_ROUTINE);
 	init_watchDog(watchdogTimeout2S); // Watchdog timer: set timeout
 		
 	// Main
-
+	generateWaveform(0);
 
 	while(1)
 	{ 
-		//checkUser();
-		generateWaveform(0);
+		mainTest();
 		watchdogReset();
 	}
+	
+	return 0;
 }

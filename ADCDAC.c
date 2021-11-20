@@ -39,6 +39,37 @@ void init_DAC(void)
 	DAC->CR |= DAC_CR_EN2; 								// Enable DAC 2
 }
 
+int optionCheckADC(signed int ADCOption)
+{
+	if (ADCOption == +4)
+	{
+		ADCOption = 0;
+	}
+	
+	else if (ADCOption <= 0)
+	{
+		ADCOption = +3;
+	}
+	
+	Channel = ADCOption;
+	return ADCOption;
+}
+
+int optionCheckDAC(int DACOption)
+{
+	if (DACOption == 4)
+	{
+		DACOption = 1;
+	}
+	
+	else if (DACOption == 0)
+	{
+		DACOption = 3;
+	}
+	
+	return DACOption;
+}
+
 unsigned short readADC_Channel(void)
 {
 	ADC1->SQR3 &=~ ADC_SQR3_SQ1; // Channel select bits

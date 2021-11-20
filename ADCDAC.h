@@ -50,6 +50,8 @@ void init_ADC(void);
 void init_DAC(void);
 void init_ADCDAC(void);
 
+int optionCheckADC(signed int ADCOption);
+int optionCheckDAC(int DACOption);
 unsigned short readADC_Channel(void);
 double readADC_Voltage(void);
 

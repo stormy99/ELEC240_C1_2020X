@@ -182,3 +182,61 @@ void loadCustomCharactersLCD(void)
 		}
 	}
 }
+
+void displayVoltageLCD(double voltage, int ADCDAC, int optionDAC, int optionADC)
+{
+	char buffer[16];
+	
+	switch(ADCDAC)
+	{
+		// DAC
+		case 0:
+			locateLCD(0, 0);
+			sprintf(buffer, "DAC: %.3fV", voltage);
+			printLCD(buffer);
+		
+			switch (optionDAC)
+			{
+				case 1:
+					locateLCD(0, 1);
+					printLCD("Sine            ");
+					break;
+				case 2:
+					locateLCD(0, 1);
+					printLCD("Triangle        ");
+					break;
+				case 3:
+					locateLCD(0, 1);
+					printLCD("Square          ");
+					break;
+			}
+			break;
+			
+		// ADC
+		case 1:
+			locateLCD(0, 0);
+			sprintf(buffer, "ADC: %.3fV", voltage);
+			printLCD(buffer);
+
+			switch (optionADC)
+			{
+				case 0:
+					locateLCD(0, 1);
+					printLCD("LDR             ");
+					break;
+				case 1:
+					locateLCD(0, 1);
+					printLCD("POT             ");
+					break;
+				case 2:
+					locateLCD(0, 1);
+					printLCD("MIC             ");
+					break;
+				case 3:
+					locateLCD(0, 1);
+					printLCD("AIN             ");
+					break;
+			}
+			break;
+	}
+}

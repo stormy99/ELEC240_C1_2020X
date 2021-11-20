@@ -53,14 +53,16 @@
 #define _OE 15 // PE15
 
 void init_LED(void);
-void LED_ON(int R, int G, int B);
+void LED_ON(int B);
 void LED_PP(int R1, int Y1, int G1);
-void LED_OD(int R2, int Y2, int G2, int W2);
+void LED_OD(int R2, int Y2, int G2);
+void LED_WT(int W2);
 void TIM4_IRQHandler(void);
 void LED_7SEG_PRINT(unsigned int n);
 void SEG_COUNTER(void);
 void trafficLights(unsigned int trafficCount);
 void LED_RGB_VOLTAGE(double m);
-void doMorse(const char *string);
+void LED_ON1(int G);
+void LED_ON2(int R);
 
 #endif 

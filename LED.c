@@ -6,6 +6,7 @@ void init_LED(void)
 	// ENABLE GPIO(x) Clocks
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN; // GPIOB (Onboard LEDs)
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN; // GPIOE (Segment LEDs)
+	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN; // GPIOF (White open drain LED)
 	
 	// CONFIGURE PORT PIN FUNCTIONS
 	/*Onboard*/
@@ -34,10 +35,24 @@ void init_LED(void)
 }
 
 // On-board MCU LEDs
-void LED_ON(int R, int G, int B) // i.e. RGB: 0,0,1 will only turn on the blue LED
+void LED_ON(int B) // i.e. RGB: 0,0,1 will only turn on the blue LED
 {
-	INT_PORT->BSRR = ((1 << (RedLED+16)) | (1 << (GreenLED+16)) | (1 << (BlueLED+16))); //Reset
-	INT_PORT->BSRR = ((R << RedLED) | (G << GreenLED) | (B << BlueLED)); //Set
+	INT_PORT->BSRR = (1 << (BlueLED+16)); //Reset
+	INT_PORT->BSRR = (B << BlueLED); //Set
+}
+
+// On-board MCU LEDs
+void LED_ON1(int G) // i.e. RGB: 0,0,1 will only turn on the blue LED
+{
+	INT_PORT->BSRR = (1 << (GreenLED+16)); //Reset
+	INT_PORT->BSRR = (G << GreenLED); //Set
+}
+
+// On-board MCU LEDs
+void LED_ON2(int R) // i.e. RGB: 0,0,1 will only turn on the blue LED
+{
+	INT_PORT->BSRR = (1 << (RedLED+16)); //Reset
+	INT_PORT->BSRR = (R << RedLED); //Set
 }
 
 // Push-pull traffic light LEDs
@@ -48,13 +63,17 @@ void LED_PP(int R1, int Y1, int G1)
 }
 
 // Open-drain traffic light LEDs
-void LED_OD(int R2, int Y2, int G2, int W2)
+void LED_OD(int R2, int Y2, int G2)
 {
 	LED_PORT->BSRR = ((1 << (RedLED2)) | (1 << (YelLED2)) | (1 << (GrnLED2))); //Reset
-	WHT_PORT->BSRR = (1 << (WhtLED2));
 	
 	LED_PORT->BSRR = ((R2 << (RedLED2 + 16)) | (Y2 << (YelLED2 + 16)) | (G2 << (GrnLED2 + 16))); //Set
-	WHT_PORT->BSRR = (W2 << (WhtLED2 + 16));
+}
+
+void LED_WT(int W2)
+{
+	WHT_PORT->BSRR = (1 << (WhtLED2)); // Reset
+	WHT_PORT->BSRR = (W2 << (WhtLED2 + 16)); // Set
 }
 
 void trafficLights(unsigned int trafficCount) 
@@ -63,7 +82,8 @@ void trafficLights(unsigned int trafficCount)
 	{
 		// Push-pull Traffic Flowing & Open-drain Traffic Waiting
 		case 0:
-			LED_OD(1, 0, 0, 0); 
+			LED_WT(0);
+			LED_OD(1, 0, 0); 
 			LED_PP(1, 0, 0); //Red
 			break;
 		
@@ -81,20 +101,20 @@ void trafficLights(unsigned int trafficCount)
 		
 		// Push-pull Traffic Waiting & Open-drain Traffic Flowing
 		case 4:
-			LED_OD(1, 0, 0, 0);
+			LED_OD(1, 0, 0);
 			LED_PP(1, 0, 0);
 			break;
 		
 		case 5:
-			LED_OD(1, 1, 0, 0);
+			LED_OD(1, 1, 0);
 			break;
 		
 		case 6:
-			LED_OD(0, 0, 1, 0);
+			LED_OD(0, 0, 1);
 			break;
 		
 		case 7:
-			LED_OD(0, 1, 0, 0);
+			LED_OD(0, 1, 0);
 			break;
 	}
 }
@@ -235,107 +255,4 @@ void LED_RGB_VOLTAGE(double m)
 	SEG_PORT->BSRR = ((1 << (SegA+16)) | (1 << (SegB+16)) | (1 << (SegC+16)) | (1 << (SegD+16)) | (1 << (SegE+16)) | (1 << (SegF+16)) | (1 << (SegG+16)) | (1 << (_DP+16)));
 	SEG_PORT->BSRR = b << 2;
 	SEG_PORT->BSRR = (1<<(BLE+16));
-}
-
-static const struct {const char letter, *code;} MorseMap[] =
-{
-	{ 'A', ".-" }, //A-Z letters
-	{ 'B', "-..." },
-	{ 'C', "-.-." },
-	{ 'D', "-.." },
-	{ 'E', "." },
-	{ 'F', "..-." },
-	{ 'G', "--." },
-	{ 'H', "...." },
-	{ 'I', ".." },
-	{ 'J', ".---" },
-	{ 'K', "-.-" },
-	{ 'L', ".-.." },
-	{ 'M', "--" },
-	{ 'N', "-." },
-	{ 'O', "---" },
-	{ 'P', ".--." },
-	{ 'Q', "--.-" },
-	{ 'R', ".-." },
-	{ 'S', "..." },
-	{ 'T', "-" },
-	{ 'U', "..-" },
-	{ 'V', "...-" },
-	{ 'W', ".--" },
-	{ 'X', "-..-" },
-	{ 'Y', "-.--" },
-	{ 'Z', "--.." },
-	
-	{ ' ', "     " }, //Space
-		
-	{ '1', ".----" }, //0-9 numbers
-	{ '2', "..---" },
-	{ '3', "...--" },
-	{ '4', "....-" },
-	{ '5', "....." },
-	{ '6', "-...." },
-	{ '7', "--..." },
-	{ '8', "---.." },
-	{ '9', "----." },
-	{ '0', "-----" },
-		
-	{ '.', ".-.-.-" }, //Special characters
-	{ ',', "--..--" },
-	{ '?', "..--.." },
-	{ '!', "-.-.--" },
-	{ ':', "---..." },
-	{ ';', "-.-.-." },
-	{ '(', "-.--." },
-	{ ')', "-.--.-" },
-	{ '"', ".-..-." },
-	{ '@', ".--.-." },
-	{ '&', ".-..." },
-};
-
-//Emit dots and dashes
-unsigned int unitLength = 71;
-void emitMorse(const char *morseString) {
-  for(int i=0; morseString[i]; i++)
-  {
-    switch( morseString[i] )
-    {
-      case '.': //dot
-				INT_PORT->BSRR = (1 << (BlueLED));
-				INT_PORT->BSRR = (1 << (BlueLED+16));
-        TIM3_wait_us(unitLength);
-        INT_PORT->BSRR = (1 << (BlueLED+16));
-        TIM3_wait_us(unitLength);
-        break;
-
-      case '-': //dash
-        INT_PORT->BSRR = (1 << (BlueLED));
-        TIM3_wait_us(unitLength * 3);
-        INT_PORT->BSRR = (1 << (BlueLED+16));
-        TIM3_wait_us(unitLength);
-          
-        break;
-
-      case ' ': //space
-        TIM3_wait_us(unitLength);
-    }
-  }
-} 
-
-//Emit a string of dots and dashes from chars
-void doMorse(const char *string) 
-{
-  unsigned int i, j;
-  
-  for( i = 0; string[i]; ++i )
-  {
-    for(j = 0; j < sizeof MorseMap / sizeof *MorseMap; ++j)
-    {
-      if(string[i] == MorseMap[j].letter)
-      {
-        emitMorse(MorseMap[j].code);
-        break;
-      }
-    }
-    emitMorse("  ");
-  }
 }

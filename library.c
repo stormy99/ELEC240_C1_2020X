@@ -19,14 +19,16 @@ void initialiseAll(void)
 	/* Set initial states */
 	// LEDs
 	LED_7SEG_PRINT(00);
-	
+	LED_OD(0, 0, 0);
+	LED_ON(0);
+	LED_WT(0);
+	LED_RGB_VOLTAGE(0);
 	
 	__enable_irq();	
 	
 	/* Set initial states */
 	// Switch states
 	switchData.BLUE = 0;
-	switchData.BLUE_SHORT_PRESS = 0;
 	switchData.BLUE_LONG_PRESS = 0;
 	switchData.BLUE_DOUBLE_PRESS = 0;
 	switchData.A = 0;
